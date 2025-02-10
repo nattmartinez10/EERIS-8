@@ -1,0 +1,5 @@
+path: /path/to/dataset
+train: images/train
+val: images/val
+nc: 1  # Number of classes (only "receipt" in this case)
+names: ['receipt']
