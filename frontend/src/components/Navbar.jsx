@@ -1,6 +1,6 @@
-import { Container, Flex, Text, Link as ChakraLink, IconButton, HStack} from "@chakra-ui/react";
+import { Container, Flex, Text, Link as ChakraLink, IconButton, HStack, Button } from "@chakra-ui/react";
 import { Link } from "react-router-dom";
-import { Moon, Sun } from "lucide-react";
+import { LuMoon, LuSun } from "react-icons/lu"
 import { useColorMode, useColorModeValue } from "./ui/color-mode";
 
 const NavBar = () => {
@@ -30,12 +30,9 @@ const NavBar = () => {
         </HStack>
 
         {/* Dark Mode Toggle Button */}
-        <IconButton
-          icon={colorMode === "light" ? <Moon /> : <Sun />}
-          aria-label="Toggle Dark Mode"
-          onClick={toggleColorMode}
-          colorScheme="gray"
-        />
+        <Button onClick={toggleColorMode} rounded={"full"}>
+            {colorMode === "light" ? <LuMoon /> : <LuSun size={20} />}
+        </Button>
       </Flex>
     </Container>
   );
