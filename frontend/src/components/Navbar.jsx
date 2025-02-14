@@ -1,7 +1,9 @@
-import { Container, Flex, Text, Link as ChakraLink, IconButton, HStack, Button } from "@chakra-ui/react";
+import { Container, Flex, Text, Link as ChakraLink, IconButton, HStack, Button, Image, Avatar } from "@chakra-ui/react";
 import { Link } from "react-router-dom";
 import { LuMoon, LuSun } from "react-icons/lu"
 import { useColorMode, useColorModeValue } from "./ui/color-mode";
+import logo from "../assets/logo1.png"; 
+
 
 const NavBar = () => {
   const { colorMode, toggleColorMode } = useColorMode();
@@ -16,6 +18,9 @@ const NavBar = () => {
         wrap="wrap"
         px={6}
       >
+        {/* Logo */}
+        <Image src={logo} alt="Logo" boxSize="40px" objectFit="contain"/>
+
         {/* Navigation Links */}
         <HStack spacing={8}>
           <ChakraLink as={Link} to="/" fontSize="lg" fontWeight="bold" color={textColor} _hover={{ color: "blue.500" }}>
@@ -29,10 +34,14 @@ const NavBar = () => {
           </ChakraLink>
         </HStack>
 
-        {/* Dark Mode Toggle Button */}
-        <Button onClick={toggleColorMode} rounded={"full"}>
+        {/* Right-Side Icons (Dark Mode + Profile) */}
+        <HStack spacing={4}>
+          <Button onClick={toggleColorMode} rounded={"full"}>
             {colorMode === "light" ? <LuMoon /> : <LuSun size={20} />}
-        </Button>
+          </Button>
+
+        
+        </HStack>
       </Flex>
     </Container>
   );
