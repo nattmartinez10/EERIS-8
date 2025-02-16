@@ -1,16 +1,28 @@
-import { Box, Heading, Button, VStack } from "@chakra-ui/react";
-import { Link } from "react-router-dom";
+import { Box, Heading, Text, VStack } from "@chakra-ui/react";
 
-function LandingPage() {
+// Example Employee Data
+const employee = {
+  name: "John Doe",
+  position: "Software Engineer",
+  department: "IT Department",
+  email: "johndoe@eeris8.com",
+};
+
+const ProfilePage = () => {
   return (
-    <Box h="100%" display="flex" alignItems="start" justifyContent="center">
-      <VStack spacing={6} p={8} rounded="xl" boxShadow="lg">
-        <Heading size="xl">
-          Welcome to EERIS-8
-        </Heading>
+    <Box p={8} maxW="md" mx="auto" textAlign="center">
+      <Heading size="xl" mb={4}>
+        Welcome to EERIS-8, {employee.name}!
+      </Heading>
+      <VStack spacing={3} align="center">
+        <Text fontSize="lg" fontWeight="bold">
+          Position: {employee.position}
+        </Text>
+        <Text fontSize="lg">Department: {employee.department}</Text>
+        <Text fontSize="lg">Email: {employee.email}</Text>
       </VStack>
     </Box>
   );
-}
+};
 
-export default LandingPage;
+export default ProfilePage;
