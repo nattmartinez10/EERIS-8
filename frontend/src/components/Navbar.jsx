@@ -23,7 +23,7 @@ const NavBar = () => {
 
         {/* Navigation Links */}
         <HStack spacing={8}>
-          <ChakraLink as={Link} to="/" fontSize="lg" fontWeight="bold" color={textColor} _hover={{ color: "blue.500" }}>
+          <ChakraLink as={Link} to="/profile" fontSize="lg" fontWeight="bold" color={textColor} _hover={{ color: "blue.500" }}>
             Home
           </ChakraLink>
           <ChakraLink as={Link} to="/expenses" fontSize="lg" fontWeight="bold" color={textColor} _hover={{ color: "blue.500" }}>
