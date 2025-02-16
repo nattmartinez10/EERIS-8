@@ -1,6 +1,10 @@
 import { Box, Heading, Table, Stack, Button } from "@chakra-ui/react";
+import ViewExpense from "./ViewExpense";
+import React, { useState } from "react";
 
 function Expenses() {
+  const [showExpense, setExpense] = useState(false);
+
   return (
     <Box p={8} textAlign="center">
       <Heading size="lg" mb={6}>My Expenses</Heading>
@@ -14,8 +18,6 @@ function Expenses() {
               <Table.ColumnHeader>Total Price</Table.ColumnHeader>
               <Table.ColumnHeader>Status</Table.ColumnHeader>
               <Table.ColumnHeader></Table.ColumnHeader>
-              
-
             </Table.Row>
           </Table.Header>
           <Table.Body>
@@ -27,13 +29,16 @@ function Expenses() {
                 <Table.Cell>{expense.totalPayment}</Table.Cell>
                 <Table.Cell>{expense.status}</Table.Cell>
                 <Table.Cell>
-                  <Button colorPalette='green'>View</Button>
+                  <Button onClick={() => setExpense(true)} colorScheme="green">View</Button>
                 </Table.Cell>
               </Table.Row>
             ))}
           </Table.Body>
         </Table.Root>
       </Stack>
+
+      {/* Render ViewExpense as a modal overlay */}
+      {showExpense && <ViewExpense onClose={() => setExpense(false)} />}
     </Box>
   );
 }
