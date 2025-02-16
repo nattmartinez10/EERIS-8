@@ -1,9 +1,23 @@
 import { Box, Button, Container, Flex, Heading, Input, Text } from "@chakra-ui/react";
+import {
+  FileUploadDropzone,
+  FileUploadList,
+  FileUploadRoot,
+} from "../components/ui/file-upload"
 
 function AddExpense() {
   return (
     <Box p={8} textAlign="center">
-      <Heading size="lg" paddingBottom={8}>Add a New Expense</Heading>
+      <Heading size="lg" paddingBottom={5}>Add a New Expense</Heading>
+      <Box display="flex" justifyContent="center">
+      <FileUploadRoot maxW="xl" alignItems="stretch" maxFiles={1} paddingBottom = {8}>
+      <FileUploadDropzone
+        label="Drag and drop here to upload image of receipt"
+        description=".png, .jpg up to 5MB"
+      />
+      <FileUploadList />
+      </FileUploadRoot>
+      </Box>
       <form>
         <Flex gap={8} h={24}>
           <Text>Receipt Name</Text>
