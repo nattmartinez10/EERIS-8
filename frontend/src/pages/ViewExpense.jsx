@@ -75,8 +75,8 @@ function ViewExpense({ onClose }) {
 
         <div style={{ display: 'flex', justifyContent: 'space-between', gap: '16px' }}>
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-            <div>
-              <h2 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '8px', color: '#0077A3' }}>Details:</h2>
+            <div style={{textAlign:'left'}}>
+              <h2 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '8px', color: '#0077A3'}}>Details:</h2>
               <p><strong>Store Name:</strong> Walmart</p>
               <p><strong>Phone:</strong> (123) 456-7890</p>
               <p><strong>Address:</strong> 123 Main St, City, State, ZIP</p>
@@ -85,7 +85,6 @@ function ViewExpense({ onClose }) {
               <p><strong>Payment Method:</strong> Credit Card</p>
               <p><strong>Total Payment:</strong> $150.00</p>
               <p><strong>Status:</strong> Reviewed</p>
-              <p><strong>Collected By:</strong> John Doe (JD)</p>
             </div>
           </div>
 
