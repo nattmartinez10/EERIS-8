@@ -36,15 +36,7 @@ const LoginPage = () => {
       bg={useColorModeValue("gray.100", "gray.900")}
       boxShadow="md"
     >
-      <Flex h={16} align="center" justify="space-between" wrap="wrap" px={6}>
-        {/* Logo */}
-        <Image src={logo} alt="Logo" boxSize="40px" objectFit="contain" />
-        <HStack spacing={4}>
-          <Button onClick={toggleColorMode} rounded={"full"}>
-            {colorMode === "light" ? <LuMoon /> : <LuSun size={20} />}
-          </Button>
-        </HStack>
-      </Flex>
+      
       <Box
         h="90vh"
         display="flex"
@@ -52,11 +44,15 @@ const LoginPage = () => {
         justifyContent="center"
         paddingBottom={"50px"}
       >
-        <Box p={8} maxW="md" borderWidth={1} borderRadius="lg" boxShadow="lg">
-          <Heading size="lg" mb={6} textAlign="center">
-            Login
-          </Heading>
+        <Box boxSizing="border-box" pr={16} pl={16} pt={30} pb={30} maxW="432px" height="400px" borderWidth={1} borderRadius="lg" boxShadow="lg">
           <VStack spacing={4}>
+          <Image
+            width="70px"
+            src={logo}
+          />
+          <Heading size="lg" mb={6} textAlign="center">
+            Sign In
+          </Heading>
             <FormControl>
               <FormLabel>Email</FormLabel>
               <Input
@@ -73,7 +69,7 @@ const LoginPage = () => {
                 onChange={(e) => setPassword(e.target.value)}
               />
             </FormControl>
-            <Button colorScheme="blue" w="full" onClick={handleLogin}>
+            <Button colorScheme="blue" w="full" rounded="full" onClick={handleLogin}>
               Login
             </Button>
           </VStack>
