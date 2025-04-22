@@ -7,8 +7,10 @@ const path = require("path");
 const mongoose = require("mongoose");
 require("dotenv").config(); // Load .env
 
-// ✅ Import auth routes
+// ✅ Import routes
 const authRoutes = require("./routes/auth");
+const receiptRoutes = require("./routes/receipts");
+
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -23,8 +25,9 @@ mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("✅ MongoDB connected"))
   .catch((err) => console.error("❌ MongoDB connection error:", err));
 
-// ✅ Auth API
+// ✅ API's
 app.use("/api/auth", authRoutes);
+app.use("/api/receipts", receiptRoutes);
 
 // ✅ ML Receipt Detection Endpoint
 app.post("/api/detect-receipt", upload.single("file"), (req, res) => {
