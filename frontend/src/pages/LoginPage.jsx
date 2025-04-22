@@ -43,6 +43,8 @@ const LoginPage = () => {
 
         // ✅ Redirect based on backend response
         window.location.href = data.redirectTo;
+        localStorage.setItem("userEmail", email); // 👈 store email
+        window.location.href = data.redirectTo;
       } else {
         setErrorMessage(data.message || "Invalid credentials.");
       }
