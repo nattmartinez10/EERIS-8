@@ -19,9 +19,10 @@ router.post("/", async (req, res) => {
       date,
       total,
       paymentMethod,
-      uploadedBy: user._id
+      uploadedBy: user._id,
+      image: req.body.image
     });
-
+    console.log("🖼️ Image length received:", req.body.image?.length);
     const saved = await newReceipt.save();
     res.status(201).json(saved);
   } catch (err) {

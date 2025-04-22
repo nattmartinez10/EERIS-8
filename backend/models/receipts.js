@@ -9,6 +9,7 @@ const receiptSchema = new mongoose.Schema({
   total: { type: Number, required: true },
   paymentMethod: { type: String, required: true },
   uploadedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true }, // Links to the user
+  image: { type: String }, // base64 string
 }, {
   timestamps: true // Automatically adds createdAt and updatedAt fields
 });

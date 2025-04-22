@@ -16,6 +16,7 @@ function AddExpense() {
   const [file, setFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [imageBase64, setImageBase64] = useState("");
   const [form, setForm] = useState({
     name: "",
     phone: "",
@@ -36,13 +37,28 @@ function AddExpense() {
       setPreviewUrl(URL.createObjectURL(uploadedFile));
       setIsLoading(true);
 
+      const toBase64 = (file) =>
+        new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.readAsDataURL(file);
+          reader.onload = () => resolve(reader.result);
+          reader.onerror = reject;
+        });
+
+        const base64 = await toBase64(uploadedFile);
+        setImageBase64(base64); // ✅ separate state just for image        
+
       const formData = new FormData();
       formData.append("file", uploadedFile);
 
       try {
-        const res = await axios.post("http://localhost:5001/api/detect-receipt", formData, {
-          headers: { "Content-Type": "multipart/form-data" },
-        });
+        const res = await axios.post(
+          "http://localhost:5001/api/detect-receipt",
+          formData,
+          {
+            headers: { "Content-Type": "multipart/form-data" },
+          }
+        );
         const data = res.data;
 
         const detailed = [];
@@ -58,18 +74,23 @@ function AddExpense() {
           }
         });
 
-        setForm({
+        setForm((prev) => ({
+          ...prev,
           name: data.store_name || "",
           phone: data.phone || "",
           address: data.address || "",
           website: data.website || "",
           date: data.date || "",
-          item: data.line_items?.map((i) => `${i.item} ($${i.price})`).join(", ") || "",
+          item:
+            data.line_items?.map((i) => `${i.item} ($${i.price})`).join(", ") ||
+            "",
           totalPayment: data.total || "",
           paymentMethod: data.payment_method || "",
           line_items: data.line_items || [],
           detailed_items: detailed,
-        });
+          image: imageBase64, // ✅ this stays intact now
+        }));
+        
       } catch (error) {
         console.error("Receipt detection failed:", error);
       } finally {
@@ -95,9 +116,46 @@ function AddExpense() {
     setForm((prev) => ({ ...prev, detailed_items: updated }));
   };
 
+  const handleSubmit = async () => {
+    const email = localStorage.getItem("userEmail"); // assumes email is saved on login
+
+    if (!email) {
+      alert("User email not found. Please log in again.");
+      return;
+    }
+
+    try {
+      const payload = {
+        email,
+        store: form.name,
+        phone: form.phone,
+        address: form.address,
+        website: form.website,
+        date: form.date,
+        total: parseFloat(form.totalPayment),
+        paymentMethod: form.paymentMethod,
+        image: imageBase64
+      };
+
+      const res = await axios.post(
+        "http://localhost:5000/api/receipts",
+        payload
+      );
+
+      if (res.status === 201) {
+        alert("✅ Receipt uploaded successfully!");
+      }
+    } catch (err) {
+      console.error("❌ Error uploading receipt:", err);
+      alert("Failed to upload receipt. Check console for details.");
+    }
+  };
+
   return (
     <Box p={8} textAlign="center">
-      <Heading size="lg" pb={5}>Add a New Expense</Heading>
+      <Heading size="lg" pb={5}>
+        Add a New Expense
+      </Heading>
 
       <Box display="flex" justifyContent="center" mb={4}>
         <input
@@ -118,19 +176,25 @@ function AddExpense() {
       {previewUrl && (
         <Box mb={6}>
           <Text mb={2}>Receipt Preview:</Text>
-          <Image src={previewUrl} alt="Uploaded receipt" maxH="300px" mx="auto" />
+          <Image
+            src={previewUrl}
+            alt="Uploaded receipt"
+            maxH="300px"
+            mx="auto"
+          />
         </Box>
       )}
 
       {isLoading ? (
         <VStack spacing={4} mt={8}>
           <Spinner size="xl" thickness="4px" speed="0.65s" color="blue.500" />
-          <Text fontSize="lg" color="gray.600">Extracting receipt data...</Text>
+          <Text fontSize="lg" color="gray.600">
+            Extracting receipt data...
+          </Text>
         </VStack>
       ) : (
         <Box textAlign="left" maxW="4xl" mx="auto" mt={8}>
           <Table.Root size="sm" striped>
-            
             <Table.Body>
               {[
                 { label: "Store", name: "name" },
@@ -158,12 +222,16 @@ function AddExpense() {
 
           {form.line_items.length > 0 && (
             <Box mt={6}>
-              <Heading size="md" mb={3}>Line Items</Heading>
+              <Heading size="md" mb={3}>
+                Line Items
+              </Heading>
               <Table.Root size="sm" striped>
                 <Table.Header>
                   <Table.Row>
                     <Table.ColumnHeader>Item</Table.ColumnHeader>
-                    <Table.ColumnHeader textAlign="end">Price</Table.ColumnHeader>
+                    <Table.ColumnHeader textAlign="end">
+                      Price
+                    </Table.ColumnHeader>
                   </Table.Row>
                 </Table.Header>
                 <Table.Body>
@@ -196,13 +264,17 @@ function AddExpense() {
 
           {form.detailed_items.length > 0 && (
             <Box mt={6}>
-              <Heading size="md" mb={3}>Detailed Items</Heading>
+              <Heading size="md" mb={3}>
+                Detailed Items
+              </Heading>
               <Table.Root size="sm" striped>
                 <Table.Header>
                   <Table.Row>
                     <Table.ColumnHeader>Quantity</Table.ColumnHeader>
                     <Table.ColumnHeader>Item</Table.ColumnHeader>
-                    <Table.ColumnHeader textAlign="end">Price</Table.ColumnHeader>
+                    <Table.ColumnHeader textAlign="end">
+                      Price
+                    </Table.ColumnHeader>
                   </Table.Row>
                 </Table.Header>
                 <Table.Body>
@@ -213,7 +285,11 @@ function AddExpense() {
                           size="sm"
                           value={item.quantity}
                           onChange={(e) =>
-                            handleDetailedItemChange(index, "quantity", e.target.value)
+                            handleDetailedItemChange(
+                              index,
+                              "quantity",
+                              e.target.value
+                            )
                           }
                         />
                       </Table.Cell>
@@ -222,7 +298,11 @@ function AddExpense() {
                           size="sm"
                           value={item.label}
                           onChange={(e) =>
-                            handleDetailedItemChange(index, "label", e.target.value)
+                            handleDetailedItemChange(
+                              index,
+                              "label",
+                              e.target.value
+                            )
                           }
                         />
                       </Table.Cell>
@@ -231,7 +311,11 @@ function AddExpense() {
                           size="sm"
                           value={item.price}
                           onChange={(e) =>
-                            handleDetailedItemChange(index, "price", e.target.value)
+                            handleDetailedItemChange(
+                              index,
+                              "price",
+                              e.target.value
+                            )
                           }
                         />
                       </Table.Cell>
@@ -244,10 +328,11 @@ function AddExpense() {
         </Box>
       )}
 
-      <Button mt={8}>Submit Receipt</Button>
+      <Button mt={8} colorScheme="blue" onClick={handleSubmit}>
+        Submit Receipt
+      </Button>
     </Box>
   );
 }
 
 export default AddExpense;
-
