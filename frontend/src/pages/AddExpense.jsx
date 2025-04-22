@@ -26,7 +26,7 @@ function AddExpense() {
     item: "",
     totalPayment: "",
     paymentMethod: "",
-    line_items: [],
+    line_items: [{ item: "", price: "" }],
     detailed_items: [],
   });
 
@@ -45,15 +45,15 @@ function AddExpense() {
           reader.onerror = reject;
         });
 
-        const base64 = await toBase64(uploadedFile);
-        setImageBase64(base64); // ✅ separate state just for image        
+      const base64 = await toBase64(uploadedFile);
+      setImageBase64(base64);
 
       const formData = new FormData();
       formData.append("file", uploadedFile);
 
       try {
         const res = await axios.post(
-          "http://localhost:5001/api/detect-receipt",
+          "http://localhost:5000/api/detect-receipt",
           formData,
           {
             headers: { "Content-Type": "multipart/form-data" },
@@ -86,11 +86,12 @@ function AddExpense() {
             "",
           totalPayment: data.total || "",
           paymentMethod: data.payment_method || "",
-          line_items: data.line_items || [],
+          line_items: data.line_items?.length
+            ? data.line_items
+            : [{ item: "", price: "" }],
           detailed_items: detailed,
-          image: imageBase64, // ✅ this stays intact now
+          image: imageBase64,
         }));
-        
       } catch (error) {
         console.error("Receipt detection failed:", error);
       } finally {
@@ -117,7 +118,7 @@ function AddExpense() {
   };
 
   const handleSubmit = async () => {
-    const email = localStorage.getItem("userEmail"); // assumes email is saved on login
+    const email = localStorage.getItem("userEmail");
 
     if (!email) {
       alert("User email not found. Please log in again.");
@@ -134,7 +135,7 @@ function AddExpense() {
         date: form.date,
         total: parseFloat(form.totalPayment),
         paymentMethod: form.paymentMethod,
-        image: imageBase64
+        image: imageBase64,
       };
 
       const res = await axios.post(
@@ -220,47 +221,74 @@ function AddExpense() {
             </Table.Body>
           </Table.Root>
 
-          {form.line_items.length > 0 && (
-            <Box mt={6}>
-              <Heading size="md" mb={3}>
-                Line Items
-              </Heading>
-              <Table.Root size="sm" striped>
-                <Table.Header>
-                  <Table.Row>
-                    <Table.ColumnHeader>Item</Table.ColumnHeader>
-                    <Table.ColumnHeader textAlign="end">
-                      Price
-                    </Table.ColumnHeader>
+          <Box mt={6}>
+            <Heading size="md" mb={3}>
+              Line Items
+            </Heading>
+            <Button
+              size="sm"
+              colorScheme="green"
+              onClick={() =>
+                setForm((prev) => ({
+                  ...prev,
+                  line_items: [...prev.line_items, { item: "", price: "" }],
+                }))
+              }
+              mb={2}
+            >
+              + Add Line Item
+            </Button>
+            <Table.Root size="sm" striped>
+              <Table.Header>
+                <Table.Row>
+                  <Table.ColumnHeader>Item</Table.ColumnHeader>
+                  <Table.ColumnHeader textAlign="end">Price</Table.ColumnHeader>
+                  <Table.ColumnHeader textAlign="center">Actions</Table.ColumnHeader>
+                </Table.Row>
+              </Table.Header>
+              <Table.Body>
+                {form.line_items.map((item, index) => (
+                  <Table.Row key={index}>
+                    <Table.Cell>
+                      <Input
+                        size="sm"
+                        value={item.item}
+                        onChange={(e) =>
+                          handleLineItemChange(index, "item", e.target.value)
+                        }
+                      />
+                    </Table.Cell>
+                    <Table.Cell textAlign="end">
+                      <Input
+                        size="sm"
+                        value={item.price}
+                        onChange={(e) =>
+                          handleLineItemChange(index, "price", e.target.value)
+                        }
+                      />
+                    </Table.Cell>
+                    <Table.Cell textAlign="center">
+                      <Button
+                        size="xs"
+                        colorScheme="red"
+                        onClick={() => {
+                          const updated = [...form.line_items];
+                          updated.splice(index, 1);
+                          setForm((prev) => ({
+                            ...prev,
+                            line_items:
+                              updated.length > 0 ? updated : [{ item: "", price: "" }],
+                          }));
+                        }}
+                      >
+                        Remove
+                      </Button>
+                    </Table.Cell>
                   </Table.Row>
-                </Table.Header>
-                <Table.Body>
-                  {form.line_items.map((item, index) => (
-                    <Table.Row key={index}>
-                      <Table.Cell>
-                        <Input
-                          size="sm"
-                          value={item.item}
-                          onChange={(e) =>
-                            handleLineItemChange(index, "item", e.target.value)
-                          }
-                        />
-                      </Table.Cell>
-                      <Table.Cell textAlign="end">
-                        <Input
-                          size="sm"
-                          value={item.price}
-                          onChange={(e) =>
-                            handleLineItemChange(index, "price", e.target.value)
-                          }
-                        />
-                      </Table.Cell>
-                    </Table.Row>
-                  ))}
-                </Table.Body>
-              </Table.Root>
-            </Box>
-          )}
+                ))}
+              </Table.Body>
+            </Table.Root>
+          </Box>
 
           {form.detailed_items.length > 0 && (
             <Box mt={6}>
@@ -272,9 +300,7 @@ function AddExpense() {
                   <Table.Row>
                     <Table.ColumnHeader>Quantity</Table.ColumnHeader>
                     <Table.ColumnHeader>Item</Table.ColumnHeader>
-                    <Table.ColumnHeader textAlign="end">
-                      Price
-                    </Table.ColumnHeader>
+                    <Table.ColumnHeader textAlign="end">Price</Table.ColumnHeader>
                   </Table.Row>
                 </Table.Header>
                 <Table.Body>
@@ -285,11 +311,7 @@ function AddExpense() {
                           size="sm"
                           value={item.quantity}
                           onChange={(e) =>
-                            handleDetailedItemChange(
-                              index,
-                              "quantity",
-                              e.target.value
-                            )
+                            handleDetailedItemChange(index, "quantity", e.target.value)
                           }
                         />
                       </Table.Cell>
@@ -298,11 +320,7 @@ function AddExpense() {
                           size="sm"
                           value={item.label}
                           onChange={(e) =>
-                            handleDetailedItemChange(
-                              index,
-                              "label",
-                              e.target.value
-                            )
+                            handleDetailedItemChange(index, "label", e.target.value)
                           }
                         />
                       </Table.Cell>
@@ -311,11 +329,7 @@ function AddExpense() {
                           size="sm"
                           value={item.price}
                           onChange={(e) =>
-                            handleDetailedItemChange(
-                              index,
-                              "price",
-                              e.target.value
-                            )
+                            handleDetailedItemChange(index, "price", e.target.value)
                           }
                         />
                       </Table.Cell>

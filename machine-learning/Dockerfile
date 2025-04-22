@@ -7,14 +7,14 @@ WORKDIR /app
 # Copy your Python script
 COPY detect.py .
 
-# Install dependencies
+# Install system dependencies for OpenCV image handling
 RUN apt-get update && apt-get install -y \
-    tesseract-ocr \
     libgl1 \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Python packages including inference-sdk
-RUN pip install --no-cache-dir opencv-python pytesseract requests inference-sdk
+# Install required Python packages
+RUN pip install --no-cache-dir opencv-python google-generativeai
 
-# Default command
+# Default command (will be overridden when run with image path)
 CMD ["python", "detect.py"]
+

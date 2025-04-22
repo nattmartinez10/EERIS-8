@@ -1,14 +1,12 @@
 import {
   Container,
   Flex,
-  Text,
   Link as ChakraLink,
-  IconButton,
   HStack,
   Button,
   Image,
 } from "@chakra-ui/react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { LuMoon, LuSun } from "react-icons/lu";
 import { useColorMode, useColorModeValue } from "./ui/color-mode";
 import logo from "../assets/logo1.png";
@@ -16,8 +14,14 @@ import logo from "../assets/logo1.png";
 const NavBar = () => {
   const { colorMode, toggleColorMode } = useColorMode();
   const textColor = useColorModeValue("gray.800", "white");
+  const navigate = useNavigate();
 
   const role = localStorage.getItem("role"); // 'admin' or 'employee'
+
+  const handleLogout = () => {
+    localStorage.clear();
+    navigate("/");
+  };
 
   return (
     <Container
@@ -87,7 +91,7 @@ const NavBar = () => {
                 color={textColor}
                 _hover={{ color: "blue.500" }}
               >
-                Expenses
+                Manage Expenses
               </ChakraLink>
               <ChakraLink
                 as={Link}
@@ -103,10 +107,13 @@ const NavBar = () => {
           )}
         </HStack>
 
-        {/* Right-Side Icons */}
+        {/* Right Side: Dark Mode and Logout */}
         <HStack spacing={4}>
           <Button onClick={toggleColorMode} rounded={"full"}>
             {colorMode === "light" ? <LuMoon /> : <LuSun size={20} />}
+          </Button>
+          <Button onClick={handleLogout} colorScheme="red" variant="outline" size="sm">
+            Log Out
           </Button>
         </HStack>
       </Flex>
