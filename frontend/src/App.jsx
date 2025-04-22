@@ -7,8 +7,10 @@ import LoginPage from "./pages/LoginPage";
 import AdminDashboard from "./pages/admin/AdminDashboard"; 
 import ManageExpenses from "./pages/admin/ManageExpenses";
 import Reports from "./pages/admin/Reports";
+import CreateUser from "./pages/admin/CreateUser";
 import { Box } from "@chakra-ui/react";
 import { useColorModeValue } from "./components/ui/color-mode";
+
 
 function App() {
   const location = useLocation();
@@ -23,6 +25,7 @@ function App() {
 
         {/* Employee Routes */}
         <Route path="/profile" element={<LandingPage />} />
+        <Route path="/employee-dashboard" element={<LandingPage />} />
         <Route path="/expenses" element={<Expenses />} />
         <Route path="/add-expense" element={<AddExpense />} />
 
@@ -30,6 +33,7 @@ function App() {
         <Route path="/admin/dashboard" element={<AdminDashboard />} />
         <Route path="/admin/manage-expenses" element={<ManageExpenses />} />
         <Route path="/admin/reports" element={<Reports />} />
+        <Route path="/admin/create-user" element={<CreateUser />} />
       </Routes>
     </Box>
   );

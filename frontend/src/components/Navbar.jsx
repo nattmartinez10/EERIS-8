@@ -103,6 +103,16 @@ const NavBar = () => {
               >
                 Reports
               </ChakraLink>
+              <ChakraLink
+                as={Link}
+                to="/admin/create-user"
+                fontSize="lg"
+                fontWeight="bold"
+                color={textColor}
+                _hover={{ color: "blue.500" }}
+              >
+                Create User
+              </ChakraLink>
             </>
           )}
         </HStack>
