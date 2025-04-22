@@ -6,6 +6,7 @@ import {
   Image,
   Spinner,
   VStack,
+  Input,
 } from "@chakra-ui/react";
 import { Table } from "@chakra-ui/react";
 import { useState } from "react";
@@ -39,13 +40,13 @@ function AddExpense() {
       formData.append("file", uploadedFile);
 
       try {
-        const res = await axios.post("http://localhost:5000/api/detect-receipt", formData, {
+        const res = await axios.post("http://localhost:5001/api/detect-receipt", formData, {
           headers: { "Content-Type": "multipart/form-data" },
         });
         const data = res.data;
 
         const detailed = [];
-        const regex = /^\s*(\d+)\s+(.*\S)\s+(\(?)\$([0-9.]+)\)?\s*$/;
+        const regex = /^\s*(\d+)\s+(.\S)\s+(\(?)\$([0-9.]+)\)?\s$/;
         data.raw_text?.split("\n").forEach((line) => {
           const match = line.match(regex);
           if (match) {
@@ -77,15 +78,22 @@ function AddExpense() {
     }
   };
 
-  const displayAttributes = [
-    { label: "Store", value: form.name },
-    { label: "Phone", value: form.phone },
-    { label: "Address", value: form.address },
-    { label: "Website", value: form.website },
-    { label: "Date", value: form.date },
-    { label: "Total", value: `$${form.totalPayment}` },
-    { label: "Payment Method", value: form.paymentMethod },
-  ];
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleLineItemChange = (index, field, value) => {
+    const updated = [...form.line_items];
+    updated[index][field] = value;
+    setForm((prev) => ({ ...prev, line_items: updated }));
+  };
+
+  const handleDetailedItemChange = (index, field, value) => {
+    const updated = [...form.detailed_items];
+    updated[index][field] = value;
+    setForm((prev) => ({ ...prev, detailed_items: updated }));
+  };
 
   return (
     <Box p={8} textAlign="center">
@@ -122,17 +130,27 @@ function AddExpense() {
       ) : (
         <Box textAlign="left" maxW="4xl" mx="auto" mt={8}>
           <Table.Root size="sm" striped>
-            <Table.Header>
-              <Table.Row>
-                <Table.ColumnHeader backgroundColor="gray.100" />
-                <Table.ColumnHeader backgroundColor="gray.100" />
-              </Table.Row>
-            </Table.Header>
+            
             <Table.Body>
-              {displayAttributes.map((attr, idx) => (
+              {[
+                { label: "Store", name: "name" },
+                { label: "Phone", name: "phone" },
+                { label: "Address", name: "address" },
+                { label: "Website", name: "website" },
+                { label: "Date", name: "date" },
+                { label: "Total", name: "totalPayment" },
+                { label: "Payment Method", name: "paymentMethod" },
+              ].map((attr, idx) => (
                 <Table.Row key={idx}>
                   <Table.Cell fontWeight="bold">{attr.label}</Table.Cell>
-                  <Table.Cell>{attr.value}</Table.Cell>
+                  <Table.Cell>
+                    <Input
+                      size="sm"
+                      name={attr.name}
+                      value={form[attr.name]}
+                      onChange={handleChange}
+                    />
+                  </Table.Cell>
                 </Table.Row>
               ))}
             </Table.Body>
@@ -151,8 +169,24 @@ function AddExpense() {
                 <Table.Body>
                   {form.line_items.map((item, index) => (
                     <Table.Row key={index}>
-                      <Table.Cell>{item.item}</Table.Cell>
-                      <Table.Cell textAlign="end">${item.price}</Table.Cell>
+                      <Table.Cell>
+                        <Input
+                          size="sm"
+                          value={item.item}
+                          onChange={(e) =>
+                            handleLineItemChange(index, "item", e.target.value)
+                          }
+                        />
+                      </Table.Cell>
+                      <Table.Cell textAlign="end">
+                        <Input
+                          size="sm"
+                          value={item.price}
+                          onChange={(e) =>
+                            handleLineItemChange(index, "price", e.target.value)
+                          }
+                        />
+                      </Table.Cell>
                     </Table.Row>
                   ))}
                 </Table.Body>
@@ -174,9 +208,33 @@ function AddExpense() {
                 <Table.Body>
                   {form.detailed_items.map((item, index) => (
                     <Table.Row key={index}>
-                      <Table.Cell>{item.quantity}</Table.Cell>
-                      <Table.Cell>{item.label}</Table.Cell>
-                      <Table.Cell textAlign="end">${item.price}</Table.Cell>
+                      <Table.Cell>
+                        <Input
+                          size="sm"
+                          value={item.quantity}
+                          onChange={(e) =>
+                            handleDetailedItemChange(index, "quantity", e.target.value)
+                          }
+                        />
+                      </Table.Cell>
+                      <Table.Cell>
+                        <Input
+                          size="sm"
+                          value={item.label}
+                          onChange={(e) =>
+                            handleDetailedItemChange(index, "label", e.target.value)
+                          }
+                        />
+                      </Table.Cell>
+                      <Table.Cell textAlign="end">
+                        <Input
+                          size="sm"
+                          value={item.price}
+                          onChange={(e) =>
+                            handleDetailedItemChange(index, "price", e.target.value)
+                          }
+                        />
+                      </Table.Cell>
                     </Table.Row>
                   ))}
                 </Table.Body>
