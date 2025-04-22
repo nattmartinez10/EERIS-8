@@ -18,53 +18,33 @@ import { LuMoon, LuSun } from "react-icons/lu";
 const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const toast = useToast();
-  const { colorMode, toggleColorMode } = useColorMode();
+  const [errorMessage, setErrorMessage] = useState(""); //  error display
 
   const handleLogin = async () => {
+    setErrorMessage(""); // reset error on submit
+
     if (!email || !password) {
-      toast({
-        title: "Missing fields",
-        description: "Please enter email and password.",
-        status: "warning",
-        duration: 3000,
-        isClosable: true,
-      });
+      setErrorMessage("Please enter both email and password.");
       return;
     }
 
     try {
       const response = await fetch("http://localhost:5000/api/auth/login", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
 
       const data = await response.json();
 
       if (response.ok) {
-        // Redirect based on role
         window.location.href = data.redirectTo;
       } else {
-        toast({
-          title: "Login failed",
-          description: data.message || "Invalid credentials",
-          status: "error",
-          duration: 3000,
-          isClosable: true,
-        });
+        setErrorMessage(data.message || "Invalid credentials.");
       }
     } catch (error) {
       console.error("Login error:", error);
-      toast({
-        title: "Error",
-        description: "Server error. Please try again later.",
-        status: "error",
-        duration: 3000,
-        isClosable: true,
-      });
+      setErrorMessage("Server error. Please try again later.");
     }
   };
 
