@@ -8,7 +8,7 @@ exports.login = async (req, res) => {
     if (!user) return res.status(401).json({ message: 'Invalid credentials' });
 
     // Simulate a redirect URL for frontend
-    const redirectTo = user.role === 'admin' ? '/admin-dashboard' : '/employee-dashboard';
+    const redirectTo = user.role === 'admin' ? '/admin/dashboard' : '/employee-dashboard';
 
     return res.status(200).json({ message: 'Login successful', role: user.role, redirectTo });
   } catch (error) {

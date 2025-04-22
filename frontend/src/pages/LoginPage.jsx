@@ -5,10 +5,8 @@ import {
   Input,
   VStack,
   Heading,
-  Flex,
   Image,
   Container,
-  HStack,
 } from "@chakra-ui/react";
 import { FormControl, FormLabel } from "@chakra-ui/form-control";
 import logo from "../assets/logo1.png";
@@ -18,10 +16,12 @@ import { LuMoon, LuSun } from "react-icons/lu";
 const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [errorMessage, setErrorMessage] = useState(""); //  error display
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const { colorMode, toggleColorMode } = useColorMode();
 
   const handleLogin = async () => {
-    setErrorMessage(""); // reset error on submit
+    setErrorMessage("");
 
     if (!email || !password) {
       setErrorMessage("Please enter both email and password.");
@@ -38,6 +38,10 @@ const LoginPage = () => {
       const data = await response.json();
 
       if (response.ok) {
+        // ✅ Store the user's role locally
+        localStorage.setItem("role", data.role);
+
+        // ✅ Redirect based on backend response
         window.location.href = data.redirectTo;
       } else {
         setErrorMessage(data.message || "Invalid credentials.");
@@ -51,28 +55,35 @@ const LoginPage = () => {
   return (
     <Container
       maxW="100%"
-      h={"100vh"}
+      h="100vh"
       px={4}
       bg={useColorModeValue("gray.100", "gray.900")}
       boxShadow="md"
     >
-      
       <Box
         h="90vh"
         display="flex"
         alignItems="center"
         justifyContent="center"
-        paddingBottom={"50px"}
+        paddingBottom="50px"
       >
-        <Box boxSizing="border-box" pr={16} pl={16} pt={30} pb={30} maxW="432px" height="400px" borderWidth={1} borderRadius="lg" boxShadow="lg">
+        <Box
+          pr={16}
+          pl={16}
+          pt={30}
+          pb={30}
+          maxW="432px"
+          borderWidth={1}
+          borderRadius="lg"
+          boxShadow="lg"
+          bg={useColorModeValue("white", "gray.800")}
+        >
           <VStack spacing={4}>
-          <Image
-            width="70px"
-            src={logo}
-          />
-          <Heading size="lg" mb={6} textAlign="center">
-            Sign In
-          </Heading>
+            <Image width="70px" src={logo} />
+            <Heading size="lg" mb={6} textAlign="center">
+              Sign In
+            </Heading>
+
             <FormControl>
               <FormLabel>Email</FormLabel>
               <Input
@@ -81,6 +92,7 @@ const LoginPage = () => {
                 onChange={(e) => setEmail(e.target.value)}
               />
             </FormControl>
+
             <FormControl>
               <FormLabel>Password</FormLabel>
               <Input
@@ -89,8 +101,24 @@ const LoginPage = () => {
                 onChange={(e) => setPassword(e.target.value)}
               />
             </FormControl>
-            <Button colorScheme="blue" w="full" rounded="full" onClick={handleLogin}>
+
+            {errorMessage && (
+              <Box color="red.500" fontSize="sm" mt={2}>
+                {errorMessage}
+              </Box>
+            )}
+
+            <Button
+              colorScheme="blue"
+              w="full"
+              rounded="full"
+              onClick={handleLogin}
+            >
               Login
+            </Button>
+
+            <Button onClick={toggleColorMode} variant="ghost" rounded="full">
+              {colorMode === "light" ? <LuMoon /> : <LuSun />}
             </Button>
           </VStack>
         </Box>
