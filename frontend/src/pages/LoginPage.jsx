@@ -39,6 +39,8 @@ const LoginPage = () => {
 
       if (response.ok) {
         window.location.href = data.redirectTo;
+        localStorage.setItem("userEmail", email); // 👈 store email
+        window.location.href = data.redirectTo;
       } else {
         setErrorMessage(data.message || "Invalid credentials.");
       }

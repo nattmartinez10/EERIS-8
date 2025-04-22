@@ -6,6 +6,7 @@ import Navbar from "./components/Navbar";
 import LoginPage from "./pages/LoginPage";
 import { Box } from "@chakra-ui/react";
 import { useColorModeValue } from "./components/ui/color-mode";
+import AdminDashboard from "./pages/AdminDashboard";
 
 function App() {
   return (
@@ -13,7 +14,8 @@ function App() {
       {location.pathname !== "/" && <Navbar />}
       <Routes>
         <Route path="/" element={<LoginPage />} />
-        <Route path="/profile" element={<LandingPage />} />
+        <Route path="/admin-dashboard" element={<AdminDashboard />} />
+        <Route path="/employee-dashboard" element={<LandingPage />} />
         <Route path="/expenses" element={<Expenses />} />
         <Route path="/add-expense" element={<AddExpense />} />
       </Routes>
