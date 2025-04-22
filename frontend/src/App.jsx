@@ -9,7 +9,6 @@ import ManageExpenses from "./pages/admin/ManageExpenses";
 import Reports from "./pages/admin/Reports";
 import { Box } from "@chakra-ui/react";
 import { useColorModeValue } from "./components/ui/color-mode";
-import AdminDashboard from "./pages/AdminDashboard";
 
 function App() {
   const location = useLocation();
@@ -21,14 +20,9 @@ function App() {
       <Routes>
         {/* Public Route */}
         <Route path="/" element={<LoginPage />} />
-<<<<<<< HEAD
 
         {/* Employee Routes */}
         <Route path="/profile" element={<LandingPage />} />
-=======
-        <Route path="/admin-dashboard" element={<AdminDashboard />} />
-        <Route path="/employee-dashboard" element={<LandingPage />} />
->>>>>>> 3da452c36c58e4fdcff028bd1e2d1762e51fb125
         <Route path="/expenses" element={<Expenses />} />
         <Route path="/add-expense" element={<AddExpense />} />
 
