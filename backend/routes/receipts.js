@@ -5,8 +5,19 @@ const User = require("../models/user");
 
 // POST: Create receipt
 router.post("/", async (req, res) => {
-  const { store, phone, address, website, date, total, paymentMethod, email } =
-    req.body;
+  const {
+    store,
+    phone,
+    address,
+    website,
+    date,
+    total,
+    paymentMethod,
+    email,
+    category, 
+    image,
+    items,
+  } = req.body;
 
   try {
     const user = await User.findOne({ email });
@@ -20,11 +31,13 @@ router.post("/", async (req, res) => {
       date,
       total,
       paymentMethod,
+      category, 
       uploadedBy: user._id,
-      image: req.body.image,
-      items: req.body.items,
+      image,
+      items,
     });
-    console.log("🖼️ Image length received:", req.body.image?.length);
+
+    console.log("🖼️ Image length received:", image?.length);
     const saved = await newReceipt.save();
     res.status(201).json(saved);
   } catch (err) {
@@ -32,13 +45,13 @@ router.post("/", async (req, res) => {
     res.status(500).json({ message: "Error saving receipt" });
   }
 });
+
 // GET: Fetch all receipts for a user by email
 router.get("/", async (req, res) => {
   const { email } = req.query;
 
   try {
     const user = await User.findOne({ email });
-
     if (!user) return res.status(404).json({ message: "User not found" });
 
     const receipts = await Receipt.find({ uploadedBy: user._id }).sort({
@@ -50,7 +63,8 @@ router.get("/", async (req, res) => {
     res.status(500).json({ message: "Error fetching receipts" });
   }
 });
-// GET: Fetch all receipts
+
+// GET: Fetch all receipts (admin)
 router.get("/all", async (req, res) => {
   try {
     const receipts = await Receipt.find().populate("uploadedBy", "name");
@@ -61,7 +75,7 @@ router.get("/all", async (req, res) => {
   }
 });
 
-// PUT /api/receipts/:id/state
+// PUT: Update receipt state (approval)
 router.put("/:id/state", async (req, res) => {
   const { state } = req.body;
 

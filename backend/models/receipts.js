@@ -6,6 +6,21 @@ const receiptSchema = new mongoose.Schema({
   address: { type: String },
   website: { type: String },
   date: { type: Date, required: true },
+  category: {
+    type: String,
+    enum: [
+      "Groceries",
+      "Restaurant",
+      "Electronics",
+      "Clothing",
+      "Transportation",
+      "Utilities",
+      "Entertainment",
+      "Medical",
+      "Other"
+    ],
+    default: "Other"
+  },  
   total: { type: Number, required: true },
   paymentMethod: { type: String, required: true },
   uploadedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true }, // Links to the user

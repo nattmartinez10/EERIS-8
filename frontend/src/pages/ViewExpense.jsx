@@ -99,6 +99,7 @@ const ViewExpense = ({ data, onClose }) => {
                 )}
               </Text>
               <Text><strong>Date:</strong> {new Date(data.date).toLocaleString()}</Text>
+              <Text><strong>Category:</strong> {data.category || "N/A"}</Text>
               <Text><strong>Payment Method:</strong> {data.paymentMethod}</Text>
               <Text><strong>Total:</strong> ${data.total.toFixed(2)}</Text>
               <Text><strong>Status:</strong> {data.state}</Text>
