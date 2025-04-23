@@ -10,6 +10,8 @@ require("dotenv").config(); // Load .env
 // ✅ Import routes
 const authRoutes = require("./routes/auth");
 const receiptRoutes = require("./routes/receipts");
+const userRoutes = require("./routes/users");
+
 
 
 const app = express();
@@ -28,6 +30,8 @@ mongoose.connect(process.env.MONGO_URI)
 // ✅ API's
 app.use("/api/auth", authRoutes);
 app.use("/api/receipts", receiptRoutes);
+app.use("/api/users", userRoutes);
+
 
 // ✅ ML Receipt Detection Endpoint
 app.post("/api/detect-receipt", upload.single("file"), (req, res) => {
