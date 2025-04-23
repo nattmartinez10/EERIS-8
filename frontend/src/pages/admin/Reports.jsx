@@ -41,15 +41,22 @@ const Reports = () => {
           const name = receipt.uploadedBy?.name || "Unknown";
           employeeMap.set(name, (employeeMap.get(name) || 0) + receipt.total);
 
-          receipt.items?.forEach((item) => {
-            const category = item.category || "Other";
-            categoryMap.set(category, (categoryMap.get(category) || 0) + item.price);
-          });
+          const category = receipt.category || "Other";
+          categoryMap.set(
+            category,
+            (categoryMap.get(category) || 0) + receipt.total
+          );
         });
 
         const employees = employeeMap.size;
-        const employeeData = Array.from(employeeMap, ([name, total]) => ({ name, total }));
-        const categoryData = Array.from(categoryMap, ([name, value]) => ({ name, value }));
+        const employeeData = Array.from(employeeMap, ([name, total]) => ({
+          name,
+          total,
+        }));
+        const categoryData = Array.from(categoryMap, ([name, value]) => ({
+          name,
+          value,
+        }));
 
         setSummary({ totalAmount, totalExpenses, employees });
         setEmployeeData(employeeData);

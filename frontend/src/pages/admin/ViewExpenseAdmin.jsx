@@ -112,6 +112,9 @@ const ViewExpenseAdmin = ({ data, onClose }) => {
             <strong>Date:</strong> {new Date(data.date).toLocaleString()}
           </Text>
           <Text>
+            <strong>Category:</strong> {data.category || "Not specified"}
+          </Text>
+          <Text>
             <strong>Payment Method:</strong> {data.paymentMethod}
           </Text>
           <Text>
