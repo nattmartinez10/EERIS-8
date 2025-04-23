@@ -119,6 +119,13 @@ function AddExpense() {
 
   const handleSubmit = async () => {
     const email = localStorage.getItem("userEmail");
+    const items = form.line_items
+    .filter((i) => i.item.trim() !== "" && !isNaN(i.price) && i.price !== "")
+    .map((i) => ({
+      item: i.item,
+      price: parseFloat(i.price),
+    }));
+
 
     if (!email) {
       alert("User email not found. Please log in again.");
@@ -136,6 +143,7 @@ function AddExpense() {
         total: parseFloat(form.totalPayment),
         paymentMethod: form.paymentMethod,
         image: imageBase64,
+        items,
       };
 
       const res = await axios.post(

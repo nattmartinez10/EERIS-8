@@ -1,153 +1,246 @@
 import {
-    Box,
-    Heading,
-    Button,
-    Badge,
-    Stack,
-  } from "@chakra-ui/react";
-  import { useState } from "react";
-  import ViewExpenseAdmin from "./ViewExpenseAdmin";
-  
-  const ManageExpenses = () => {
-    const [selectedExpense, setSelectedExpense] = useState(null);
-  
-    const handleAction = (id, action) => {
-      console.log(`Performing ${action} on expense ${id}`);
-      // TODO: Send request to backend here (PUT /api/expenses/:id)
-    };
-  
-    return (
-      <Box p={8}>
-        <Heading size="lg" mb={6}>
-          Manage Submitted Expenses
-        </Heading>
-  
-        <Box overflowX="auto" borderRadius="lg" bg="white" p={4} boxShadow="md">
-          <table style={{ width: "100%", borderCollapse: "collapse" }}>
-            <thead>
-              <tr>
-                <th style={thStyle}>Employee</th>
-                <th style={thStyle}>Date</th>
-                <th style={thStyle}>Total</th>
-                <th style={thStyle}>Payment</th>
-                <th style={thStyle}>Status</th>
-                <th style={thStyle}>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {mockExpenses.map((expense) => (
-                <tr key={expense.id}>
-                  <td style={tdStyle}>{expense.employee}</td>
-                  <td style={tdStyle}>{expense.date}</td>
-                  <td style={tdStyle}>${expense.total}</td>
-                  <td style={tdStyle}>{expense.paymentMethod}</td>
-                  <td style={tdStyle}>
-                    <Badge colorScheme={getBadgeColor(expense.status)}>
-                      {expense.status}
-                    </Badge>
-                  </td>
-                  <td style={tdStyle}>
-                    <Stack direction="row" spacing={2}>
-                      <Button size="sm" onClick={() => setSelectedExpense(expense)}>
-                        View
-                      </Button>
-                      <Button
-                        size="sm"
-                        colorScheme="green"
-                        onClick={() => handleAction(expense.id, "approve")}
-                        isDisabled={expense.status !== "Pending"}
-                      >
-                        Approve
-                      </Button>
-                      <Button
-                        size="sm"
-                        colorScheme="red"
-                        onClick={() => handleAction(expense.id, "reject")}
-                        isDisabled={expense.status !== "Pending"}
-                      >
-                        Reject
-                      </Button>
-                      <Button
-                        size="sm"
-                        colorScheme="orange"
-                        onClick={() => handleAction(expense.id, "request-info")}
-                        isDisabled={expense.status !== "Pending"}
-                      >
-                        Request Info
-                      </Button>
-                    </Stack>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </Box>
-  
-        {/* View Expense Modal */}
-        {selectedExpense && (
-          <ViewExpenseAdmin
-            data={selectedExpense}
-            onClose={() => setSelectedExpense(null)}
-          />
-        )}
-      </Box>
-    );
-  };
-  
-  // Styling for native table elements
-  const thStyle = {
-    textAlign: "left",
-    padding: "10px",
-    borderBottom: "1px solid #e2e8f0",
-    background: "#f7fafc",
-  };
-  
-  const tdStyle = {
-    padding: "10px",
-    borderBottom: "1px solid #e2e8f0",
-  };
-  
-  const mockExpenses = [
-    {
-      id: "1",
-      employee: "John Doe",
-      date: "2025-04-12",
-      total: 120.45,
-      paymentMethod: "Credit Card",
-      status: "Pending",
-    },
-    {
-      id: "2",
-      employee: "Jane Smith",
-      date: "2025-04-10",
-      total: 75.0,
-      paymentMethod: "Cash",
-      status: "Approved",
-    },
-    {
-      id: "3",
-      employee: "Carlos Perez",
-      date: "2025-04-09",
-      total: 200.99,
-      paymentMethod: "Bank Transfer",
-      status: "Pending",
-    },
-  ];
-  
-  const getBadgeColor = (status) => {
-    switch (status) {
-      case "Approved":
-        return "green";
-      case "Rejected":
-        return "red";
-      case "Pending":
-        return "yellow";
-      case "Waiting for Info":
-        return "orange";
-      default:
-        return "gray";
+  Box,
+  Heading,
+  Button,
+  Stack,
+  Text,
+  VStack,
+  HStack,
+  Spinner,
+} from "@chakra-ui/react";
+import { useColorModeValue } from "../../components/ui/color-mode";
+import { useState, useEffect } from "react";
+import ViewExpenseAdmin from "./ViewExpenseAdmin";
+import axios from "axios";
+import { ChevronDownIcon, ChevronUpIcon } from "lucide-react";
+
+const ManageExpenses = () => {
+  const [selectedExpense, setSelectedExpense] = useState(null);
+  const [expenses, setExpenses] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [sortKey, setSortKey] = useState(null);
+  const [sortOrder, setSortOrder] = useState("asc");
+
+  const handleAction = async (id, action) => {
+    try {
+      const res = await axios.put(
+        `http://localhost:5000/api/receipts/${id}/state`,
+        {
+          state: action === "approve" ? "approved" : "rejected",
+        }
+      );
+
+      setExpenses((prev) =>
+        prev.map((e) => (e._id === id ? { ...e, state: res.data.state } : e))
+      );
+    } catch (err) {
+      console.error("❌ Failed to update receipt state:", err);
     }
   };
-  
-  export default ManageExpenses;
-  
+
+  const fetchExpenses = async () => {
+    try {
+      const res = await axios.get("http://localhost:5000/api/receipts/all");
+      setExpenses(res.data);
+    } catch (error) {
+      console.error("❌ Failed to fetch receipts:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchExpenses();
+  }, []);
+
+  const bgColor = useColorModeValue("white", "gray.800");
+  const headerBg = useColorModeValue("gray.100", "gray.700");
+  const borderColor = useColorModeValue("gray.200", "gray.600");
+  const textColor = useColorModeValue("gray.800", "gray.100");
+  const labelColor = useColorModeValue("gray.600", "gray.300");
+
+  const getStatusCircleColor = (status) => {
+    switch (status) {
+      case "approved":
+        return "green.400";
+      case "rejected":
+        return "red.400";
+      case "pending":
+        return "orange.400";
+      default:
+        return "gray.400";
+    }
+  };
+
+  const handleSort = (key) => {
+    const newOrder = sortKey === key && sortOrder === "asc" ? "desc" : "asc";
+    setSortKey(key);
+    setSortOrder(newOrder);
+    const sorted = [...expenses].sort((a, b) => {
+      let valA = a[key];
+      let valB = b[key];
+      if (key === "uploadedBy") {
+        valA = a.uploadedBy?.name || "";
+        valB = b.uploadedBy?.name || "";
+      }
+      if (key === "date") {
+        valA = new Date(a.date);
+        valB = new Date(b.date);
+      }
+      if (valA < valB) return newOrder === "asc" ? -1 : 1;
+      if (valA > valB) return newOrder === "asc" ? 1 : -1;
+      return 0;
+    });
+    setExpenses(sorted);
+  };
+
+  const renderSortIndicator = (key) => {
+    if (sortKey !== key) return null;
+    return sortOrder === "asc" ? (
+      <ChevronUpIcon style={{ display: "inline" }} />
+    ) : (
+      <ChevronDownIcon style={{ display: "inline" }} />
+    );
+  };
+
+  return (
+    <Box p={8}>
+      <Heading size="lg" mb={6} color={textColor}>
+        Manage Submitted Expenses
+      </Heading>
+
+      {loading ? (
+        <Spinner size="xl" color="blue.500" />
+      ) : expenses.length === 0 ? (
+        <Text color={textColor}>No submitted expenses found.</Text>
+      ) : (
+        <Box
+          overflowX="auto"
+          borderRadius="lg"
+          bg={bgColor}
+          p={4}
+          boxShadow="md"
+        >
+          <VStack spacing={4} align="stretch">
+            <HStack
+              spacing={6}
+              bg={headerBg}
+              p={2}
+              borderBottomWidth="1px"
+              borderColor={borderColor}
+              color={labelColor}
+            >
+              <Box
+                flex="1"
+                fontWeight="bold"
+                cursor="pointer"
+                onClick={() => handleSort("uploadedBy")}
+              >
+                Employee {renderSortIndicator("uploadedBy")}
+              </Box>
+              <Box
+                flex="1"
+                fontWeight="bold"
+                cursor="pointer"
+                onClick={() => handleSort("date")}
+              >
+                Date {renderSortIndicator("date")}
+              </Box>
+              <Box
+                flex="1"
+                fontWeight="bold"
+                cursor="pointer"
+                onClick={() => handleSort("total")}
+              >
+                Total {renderSortIndicator("total")}
+              </Box>
+              <Box flex="1" fontWeight="bold">
+                Payment
+              </Box>
+              <Box
+                flex="1"
+                fontWeight="bold"
+                cursor="pointer"
+                onClick={() => handleSort("state")}
+              >
+                Status {renderSortIndicator("state")}
+              </Box>
+              <Box flex="2" fontWeight="bold">
+                Actions
+              </Box>
+            </HStack>
+
+            {expenses.map((expense) => (
+              <HStack
+                key={expense._id}
+                spacing={6}
+                p={2}
+                borderBottomWidth="1px"
+                borderColor={borderColor}
+                color={textColor}
+              >
+                <Box flex="1">{expense.uploadedBy?.name || "Unknown"}</Box>
+                <Box flex="1">
+                  {new Date(expense.date).toLocaleDateString()}
+                </Box>
+                <Box flex="1">${expense.total.toFixed(2)}</Box>
+                <Box flex="1">{expense.paymentMethod}</Box>
+                <Box flex="1">
+                  <HStack>
+                    <Box
+                      w={3}
+                      h={3}
+                      borderRadius="full"
+                      bg={getStatusCircleColor(expense.state)}
+                    />
+                    <Text fontSize="sm" textTransform="capitalize">
+                      {expense.state}
+                    </Text>
+                  </HStack>
+                </Box>
+                <Box flex="2">
+                  <Stack direction="row" spacing={2}>
+                    <Button
+                      size="sm"
+                      onClick={() => setSelectedExpense(expense)}
+                    >
+                      View
+                    </Button>
+                    <Button
+                      size="sm"
+                      colorScheme="green"
+                      onClick={() => handleAction(expense._id, "approve")}
+                      isDisabled={expense.state !== "pending"}
+                    >
+                      Approve
+                    </Button>
+                    <Button
+                      size="sm"
+                      colorScheme="red"
+                      onClick={() => handleAction(expense._id, "reject")}
+                      isDisabled={expense.state !== "pending"}
+                    >
+                      Reject
+                    </Button>
+                  </Stack>
+                </Box>
+              </HStack>
+            ))}
+          </VStack>
+        </Box>
+      )}
+
+      {selectedExpense && (
+        <ViewExpenseAdmin
+          data={selectedExpense}
+          onClose={() => {
+            setSelectedExpense(null);
+            fetchExpenses();
+          }}
+        />
+      )}
+    </Box>
+  );
+};
+
+export default ManageExpenses;

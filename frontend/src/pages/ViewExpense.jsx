@@ -1,129 +1,137 @@
-import React, { useState } from 'react';
-import { X } from 'lucide-react';
-import receiptImage from "../assets/receiptImage.jpg"; 
+import {
+  Box,
+  Image,
+  VStack,
+  HStack,
+  Link,
+  Heading,
+  Text,
+  Button,
+} from "@chakra-ui/react";
+import { useColorMode, useColorModeValue } from "../components/ui/color-mode";
+const ViewExpense = ({ data, onClose }) => {
+  const bgCard = useColorModeValue("gray.50", "gray.800");
+  const textColor = useColorModeValue("gray.800", "gray.100");
+  const lineItemBg = useColorModeValue("white", "gray.700");
+  const linkColor = useColorModeValue("blue.600", "blue.300");
+  const headingColor = useColorModeValue("blue.700", "blue.200");
 
-
-function ViewExpense({ onClose }) {
-  const [isImageModalOpen, setImageModalOpen] = useState(false);
-
-  const toggleImageModal = () => {
-    setImageModalOpen(!isImageModalOpen);
-  };
-
-  const lineItems = [
-    '1x Groceries - $50.00',
-    '1x Electronics - $80.00',
-    '1x Household Items - $20.00',
-    '1x Furniture - $200.00',
-    '1x Clothing - $75.00',
-    '1x Tools - $40.00',
-    '1x Toys - $30.00',
-    '1x Stationery - $15.00',
-  ];
+  if (!data) return null;
 
   return (
-    <div
-      style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        width: '100%',
-        height: '100%',
-        backgroundColor: 'rgba(0, 0, 0, 0.5)',
-        backdropFilter: 'blur(10px)',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        zIndex: 1000,
-      }}
+    <Box
+      position="fixed"
+      top={0}
+      left={0}
+      width="100vw"
+      height="100vh"
+      bg="blackAlpha.600"
+      display="flex"
+      justifyContent="center"
+      alignItems="center"
+      zIndex={1000}
     >
-      <div
-        style={{
-          backgroundColor: '#f4f8fb',
-          borderRadius: '12px',
-          padding: '24px',
-          width: '90%',
-          maxWidth: '600px',
-          position: 'relative',
-          boxShadow: '0 8px 16px rgba(0, 0, 0, 0.2)',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '16px',
-        }}
+      <Box
+        bg={bgCard}
+        color={textColor}
+        borderRadius="lg"
+        p={6}
+        maxW="5xl"
+        width="100%"
+        maxHeight="90vh"
+        overflowY="auto"
+        position="relative"
+        boxShadow="lg"
       >
-        <button
-          style={{
-            position: 'absolute',
-            top: '16px',
-            right: '16px',
-            background: 'transparent',
-            border: 'none',
-            cursor: 'pointer',
-            color: '#666',
-          }}
+        <Button
           onClick={onClose}
+          position="absolute"
+          top={3}
+          right={3}
+          size="sm"
+          colorScheme="gray"
         >
-          <X size={20} />
-        </button>
+          Close
+        </Button>
 
-        <img
-          src={receiptImage}
-          alt="Mock Receipt"
-          style={{ width: '100%', height: '150px', borderRadius: '8px', border: '1px solid #ddd', objectFit: 'cover', cursor: 'pointer' }}
-          onClick={toggleImageModal}
-        />
-
-        <div style={{ display: 'flex', justifyContent: 'space-between', gap: '16px' }}>
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-            <div style={{textAlign:'left'}}>
-              <h2 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '8px', color: '#0077A3'}}>Details:</h2>
-              <p><strong>Store Name:</strong> Walmart</p>
-              <p><strong>Phone:</strong> (123) 456-7890</p>
-              <p><strong>Address:</strong> 123 Main St, City, State, ZIP</p>
-              <p><strong>Website:</strong> <a href="https://www.walmart.com" target="_blank" rel="noopener noreferrer">www.walmart.com</a></p>
-              <p><strong>Date & Time:</strong> 2025-02-13 14:30</p>
-              <p><strong>Payment Method:</strong> Credit Card</p>
-              <p><strong>Total Payment:</strong> $150.00</p>
-              <p><strong>Status:</strong> Reviewed</p>
-            </div>
-          </div>
-
-          <div style={{ flex: 1, backgroundColor: '#E6F4F1', padding: '8px', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)', height: '260px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-            <h2 style={{ fontSize: '18px', fontWeight: 'bold', color: '#0077A3' }}>Line Items:</h2>
-            {lineItems.map((item, index) => (
-              <div key={index} style={{ backgroundColor: 'white', padding: '8px', borderRadius: '8px', boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)' }}>
-                {item}
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {isImageModalOpen && (
-          <div
+        <VStack spacing={6} align="stretch">
+          <a
+            href={data.image}
+            target="_blank"
+            rel="noopener noreferrer"
             style={{
-              position: 'fixed',
-              top: 0,
-              left: 0,
-              width: '100%',
-              height: '100%',
-              backgroundColor: 'rgba(0, 0, 0, 0.9)',
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              zIndex: 1100,
+              display: "block",
+              borderRadius: "8px",
+              overflow: "hidden",
+              maxHeight: "400px",
+              background: lineItemBg,
+              border: "1px solid #ccc",
             }}
-            onClick={toggleImageModal}
           >
-            <img
-              src={receiptImage}
-              alt="Full Receipt"
-              style={{ maxWidth: '90%', maxHeight: '90%', borderRadius: '8px' }}
+            <Image
+              src={data.image}
+              alt="Receipt"
+              w="100%"
+              maxH="400px"
+              objectFit="contain"
+              borderRadius="md"
+              cursor="pointer"
             />
-          </div>
-        )}
-      </div>
-    </div>
+          </a>
+
+          <HStack align="start" spacing={8} flexWrap="wrap">
+            {/* Receipt Info */}
+            <Box flex={1} minW="250px">
+              <Heading size="sm" mb={2} color={headingColor}>
+                Details
+              </Heading>
+              <Text><strong>Store:</strong> {data.store}</Text>
+              <Text><strong>Phone:</strong> {data.phone || "N/A"}</Text>
+              <Text><strong>Address:</strong> {data.address || "N/A"}</Text>
+              <Text>
+                <strong>Website:</strong>{" "}
+                {data.website ? (
+                  <Link href={data.website} isExternal color={linkColor}>
+                    {data.website}
+                  </Link>
+                ) : (
+                  "N/A"
+                )}
+              </Text>
+              <Text><strong>Date:</strong> {new Date(data.date).toLocaleString()}</Text>
+              <Text><strong>Payment Method:</strong> {data.paymentMethod}</Text>
+              <Text><strong>Total:</strong> ${data.total.toFixed(2)}</Text>
+              <Text><strong>Status:</strong> {data.state}</Text>
+            </Box>
+
+            {/* Line Items */}
+            <Box flex={1} minW="250px" maxH="260px" overflowY="auto">
+              <Heading size="sm" mb={2} color={headingColor}>
+                Line Items
+              </Heading>
+              <VStack spacing={2} align="stretch">
+                {data.items && data.items.length > 0 ? (
+                  data.items.map((item, idx) => (
+                    <Box
+                      key={idx}
+                      p={2}
+                      bg={lineItemBg}
+                      borderRadius="md"
+                      boxShadow="sm"
+                    >
+                      {item.item} - ${item.price.toFixed(2)}
+                    </Box>
+                  ))
+                ) : (
+                  <Text>No line items available.</Text>
+                )}
+              </VStack>
+            </Box>
+          </HStack>
+        </VStack>
+      </Box>
+    </Box>
   );
-}
+};
 
 export default ViewExpense;
